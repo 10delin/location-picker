@@ -30,6 +30,7 @@ const MyMap = () => {
   let zoom = 8.3;
   const [keyword, setKeyword] = useState('');
   const [data, setData] = useState([]);
+  const [position, setPosition] = useState(center)
 
 
 
@@ -53,7 +54,7 @@ const MyMap = () => {
     evt.preventDefault();
     const fetchData = async () => {
           const res = await fetch(
-            `https://nominatim.openstreetmap.org/search?format=json&q=${keyword}+andalucia`,
+            `https://nominatim.openstreetmap.org/search?format=json&q=${keyword}+andalucia+españa`,
           );
           const json = await res.json();
           setData(json);
@@ -66,15 +67,14 @@ const MyMap = () => {
     setKeyword(evt.target.value)
   }
 
-  function newCenter(lat, lng){
-    center = [lat ,lng];
+  function newCenter(e, lat, lng){
+    e.preventDefault();
+    setPosition([lat, lng])
     zoom = 17;
   }
 
   
   function DraggableMarker() {
-    const [draggable, setDraggable] = useState(false)
-    const [position, setPosition] = useState(center)
     const markerRef = useRef(null)
     const eventHandlers = useMemo(
       () => ({
@@ -87,16 +87,13 @@ const MyMap = () => {
       }),
       [],
     )
-    const toggleDraggable = useCallback(() => {
-      setDraggable((d) => !d)
-    }, [])
 
     return (
       <Marker
-        draggable={toggleDraggable}
+        draggable={true}
         eventHandlers={eventHandlers}
         position={position}
-        icon={GetIcon(25, "red")}
+        icon={GetIcon(30, "red")}
         ref={markerRef}>
       </Marker>
     )
@@ -134,8 +131,7 @@ const MyMap = () => {
 
               <li key={item.place_id}>
 
-                <p onClick={newCenter(item.lat, item.lon)}>{item.display_name} </p>
-                {console.log(newCenter, item.lat , item.lon) }
+                <a href="#" onClick={(e) => newCenter(e,item.lat, item.lon)}>{item.display_name} </a>
               </li>
 
             ))}
